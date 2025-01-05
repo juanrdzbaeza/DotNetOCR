@@ -64,5 +64,36 @@ namespace DotNetOCR
                 MessageBox.Show($"An error occurred while trying to open the link: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            if (Clipboard.ContainsImage())
+            {
+                using (var image = Clipboard.GetImage())
+                {
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        image.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Png);
+                        memoryStream.Position = 0;
+                        using (var pix = Pix.LoadFromMemory(memoryStream.ToArray()))
+                        {
+                            string tessdataPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "tessdata\\");
+                            using (var engine = new TesseractEngine(tessdataPath, "spa", EngineMode.Default))
+                            {
+                                using (var page = engine.Process(pix))
+                                {
+                                    string extractedText = page.GetText();
+                                    txtExtractedText.Text = extractedText;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                MessageBox.Show("No image found in the clipboard.");
+            }
+        }
     }
 }
