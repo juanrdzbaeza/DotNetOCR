@@ -1,0 +1,10 @@
+Instrucciones rápidas para crear el proyecto .vdproj en Visual Studio:
+
+1. Instala Visual Studio Installer Projects.
+2. Ejecuta `installer\prepare_installer.ps1` desde PowerShell con la ruta correcta para copiar archivos a `installer\package`.
+3. En Visual Studio, crea nuevo proyecto 'Setup Project'.
+4. En 'File System' del Setup Project, añade los archivos desde la carpeta `installer\package`.
+5. Configura TargetPlatform y propiedades del instalador.
+6. Build del Setup Project para generar el MSI.
+
+Asegúrate de incluir la carpeta `tessdata` y las DLL nativas junto al exe.
