@@ -124,5 +124,10 @@ namespace DotNetOCR
             rtbOutput.SelectionStart = rtbOutput.TextLength;
             rtbOutput.ScrollToCaret();
         }
+
+        private void DotNetOCR_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }

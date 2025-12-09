@@ -33,60 +33,57 @@ namespace DotNetOCR
         /// </summary>
         private void InitializeComponent()
         {
-            components = new System.ComponentModel.Container();
-            this.btnSelectPdf = new System.Windows.Forms.Button();
-            this.rtbOutput = new System.Windows.Forms.RichTextBox();
-            this.progressBar = new System.Windows.Forms.ProgressBar();
-            this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
-            this.SuspendLayout();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DotNetOCR));
+            btnSelectPdf = new Button();
+            rtbOutput = new RichTextBox();
+            progressBar = new ProgressBar();
+            openFileDialog1 = new OpenFileDialog();
+            SuspendLayout();
             // 
             // btnSelectPdf
             // 
-            this.btnSelectPdf.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnSelectPdf.Location = new System.Drawing.Point(12, 12);
-            this.btnSelectPdf.Name = "btnSelectPdf";
-            this.btnSelectPdf.Size = new System.Drawing.Size(120, 30);
-            this.btnSelectPdf.TabIndex = 0;
-            this.btnSelectPdf.Text = "Seleccionar PDF";
-            this.btnSelectPdf.UseVisualStyleBackColor = true;
-            this.btnSelectPdf.Click += new System.EventHandler(this.btnSelectPdf_Click);
-            // 
-            // progressBar
-            // 
-            this.progressBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.progressBar.Location = new System.Drawing.Point(150, 17);
-            this.progressBar.Name = "progressBar";
-            this.progressBar.Size = new System.Drawing.Size(638, 20);
-            this.progressBar.TabIndex = 2;
-            this.progressBar.Visible = false;
+            btnSelectPdf.Location = new Point(12, 12);
+            btnSelectPdf.Name = "btnSelectPdf";
+            btnSelectPdf.Size = new Size(120, 30);
+            btnSelectPdf.TabIndex = 0;
+            btnSelectPdf.Text = "Seleccionar PDF";
+            btnSelectPdf.UseVisualStyleBackColor = true;
+            btnSelectPdf.Click += btnSelectPdf_Click;
             // 
             // rtbOutput
             // 
-            this.rtbOutput.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.rtbOutput.Location = new System.Drawing.Point(12, 60);
-            this.rtbOutput.Name = "rtbOutput";
-            this.rtbOutput.Size = new System.Drawing.Size(776, 378);
-            this.rtbOutput.TabIndex = 1;
-            this.rtbOutput.Text = "";
+            rtbOutput.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            rtbOutput.Location = new Point(12, 60);
+            rtbOutput.Name = "rtbOutput";
+            rtbOutput.Size = new Size(1118, 643);
+            rtbOutput.TabIndex = 1;
+            rtbOutput.Text = "";
+            // 
+            // progressBar
+            // 
+            progressBar.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            progressBar.Location = new Point(150, 17);
+            progressBar.Name = "progressBar";
+            progressBar.Size = new Size(980, 20);
+            progressBar.TabIndex = 2;
+            progressBar.Visible = false;
             // 
             // openFileDialog1
             // 
-            this.openFileDialog1.Filter = "PDF files (*.pdf)|*.pdf";
-            this.openFileDialog1.Title = "Seleccionar archivo PDF";
+            openFileDialog1.Filter = "PDF files (*.pdf)|*.pdf";
+            openFileDialog1.Title = "Seleccionar archivo PDF";
             // 
             // DotNetOCR
             // 
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Controls.Add(this.rtbOutput);
-            this.Controls.Add(this.progressBar);
-            this.Controls.Add(this.btnSelectPdf);
-            this.Name = "DotNetOCR";
-            this.Text = "DotNetOCR - OCR de PDF";
-            this.ResumeLayout(false);
+            AutoScaleDimensions = new SizeF(10F, 25F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(1142, 715);
+            Controls.Add(rtbOutput);
+            Controls.Add(progressBar);
+            Controls.Add(btnSelectPdf);
+            Name = "DotNetOCR";
+            Text = "DotNetOCR - OCR de PDF";
+            ResumeLayout(false);
         }
 
         #endregion
