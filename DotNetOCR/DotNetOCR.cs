@@ -32,20 +32,29 @@ namespace DotNetOCR
 
                 // Determine tessdata path
                 string tessdataPath = Environment.GetEnvironmentVariable("TESSDATA_PREFIX") ?? string.Empty;
+                string defaultTessdata = Path.Combine(AppContext.BaseDirectory, "tessdata");
+
                 if (string.IsNullOrWhiteSpace(tessdataPath) || !Directory.Exists(tessdataPath))
                 {
-                    // Ask user to select tessdata folder if not set
-                    using var fbd = new FolderBrowserDialog();
-                    fbd.Description = "Selecciona la carpeta que contiene los archivos tessdata (por ejemplo spa.traineddata).";
-                    if (fbd.ShowDialog() == DialogResult.OK)
+                    if (Directory.Exists(defaultTessdata))
                     {
-                        tessdataPath = fbd.SelectedPath;
+                        tessdataPath = defaultTessdata;
+                    }
+                    else
+                    {
+                        // Ask user to select tessdata folder if not set and not found in app folder
+                        using var fbd = new FolderBrowserDialog();
+                        fbd.Description = "Selecciona la carpeta que contiene los archivos tessdata (por ejemplo spa.traineddata).";
+                        if (fbd.ShowDialog() == DialogResult.OK)
+                        {
+                            tessdataPath = fbd.SelectedPath;
+                        }
                     }
                 }
 
                 if (string.IsNullOrWhiteSpace(tessdataPath) || !Directory.Exists(tessdataPath))
                 {
-                    MessageBox.Show("No se ha encontrado la carpeta tessdata. Por favor, configure la variable de entorno TESSDATA_PREFIX o seleccione la carpeta manualmente.", "Tessdata no encontrado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("No se ha encontrado la carpeta tessdata. Por favor, configure la variable de entorno TESSDATA_PREFIX, coloque la carpeta 'tessdata' junto al ejecutable o seleccione la carpeta manualmente.", "Tessdata no encontrado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     progressBar.Visible = false;
                     return;
                 }
@@ -155,23 +164,34 @@ namespace DotNetOCR
                         using (var pix = Pix.LoadFromMemory(memoryStream.ToArray()))
                         {
                             string tessdataPath = Environment.GetEnvironmentVariable("TESSDATA_PREFIX") ?? string.Empty;
+                            string defaultTessdata = Path.Combine(AppContext.BaseDirectory, "tessdata");
+
                             if (string.IsNullOrWhiteSpace(tessdataPath) || !Directory.Exists(tessdataPath))
                             {
-                                using var fbd = new FolderBrowserDialog();
-                                fbd.Description = "Selecciona la carpeta que contiene los archivos tessdata (por ejemplo spa.traineddata).";
-                                if (fbd.ShowDialog() == DialogResult.OK)
+                                if (Directory.Exists(defaultTessdata))
                                 {
-                                    tessdataPath = fbd.SelectedPath;
+                                    tessdataPath = defaultTessdata;
+                                }
+                                else
+                                {
+                                    using var fbd = new FolderBrowserDialog();
+                                    fbd.Description = "Selecciona la carpeta que contiene los archivos tessdata (por ejemplo spa.traineddata).";
+                                    if (fbd.ShowDialog() == DialogResult.OK)
+                                    {
+                                        tessdataPath = fbd.SelectedPath;
+                                    }
                                 }
                             }
 
                             if (string.IsNullOrWhiteSpace(tessdataPath) || !Directory.Exists(tessdataPath))
                             {
-                                MessageBox.Show("No se ha encontrado la carpeta tessdata. Por favor, configure la variable de entorno TESSDATA_PREFIX o seleccione la carpeta manualmente.", "Tessdata no encontrado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                                MessageBox.Show("No se ha encontrado la carpeta tessdata. Por favor, configure la variable de entorno TESSDATA_PREFIX, coloque la carpeta 'tessdata' junto al ejecutable o seleccione la carpeta manualmente.", "Tessdata no encontrado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                                 return;
                             }
 
-                            using (var engine = new TesseractEngine(tessdataPath, File.Exists(Path.Combine(tessdataPath, "spa.traineddata")) ? "spa" : "eng", EngineMode.Default))
+                            string lang = File.Exists(Path.Combine(tessdataPath, "spa.traineddata")) ? "spa" : "eng";
+
+                            using (var engine = new TesseractEngine(tessdataPath, lang, EngineMode.Default))
                             {
                                 using (var page = engine.Process(pix))
                                 {
