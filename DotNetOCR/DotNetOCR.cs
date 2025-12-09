@@ -52,35 +52,77 @@ namespace DotNetOCR
                 // Default language: spanish if available, otherwise english
                 string lang = File.Exists(Path.Combine(tessdataPath, "spa.traineddata")) ? "spa" : "eng";
 
-                // Run OCR in background to keep UI responsive
+                string ext = Path.GetExtension(filePath).ToLowerInvariant();
+
+                // Handle PDF and image files in background to keep UI responsive
                 await Task.Run(() =>
                 {
                     try
                     {
                         using var engine = new TesseractEngine(tessdataPath, lang, EngineMode.Default);
 
-                        for (int i = 0; i < pageCount; i++)
+                        if (ext == ".pdf")
                         {
-                            // Render page to bitmap at 150 DPI
-                            using var image = document.Render(i, 150, 150, PdfRenderFlags.CorrectFromDpi);
+                            // PDF flow (existing behavior)
+                            using var document = PdfDocument.Load(filePath);
+                            int pageCount = document.PageCount;
+                            progressBar.Invoke(new Action(() => progressBar.Maximum = Math.Max(1, pageCount)));
 
-                            // Convert Bitmap to Pix via memory stream
-                            using var ms = new MemoryStream();
-                            image.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
-                            var bytes = ms.ToArray();
+                            for (int i = 0; i < pageCount; i++)
+                            {
+                                // Render page to bitmap at 150 DPI
+                                using var image = document.Render(i, 150, 150, PdfRenderFlags.CorrectFromDpi);
 
-                            using var pix = Pix.LoadFromMemory(bytes);
+                                // Convert Bitmap to Pix via memory stream
+                                using var ms = new MemoryStream();
+                                image.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+                                var bytes = ms.ToArray();
+
+                                using var pix = Pix.LoadFromMemory(bytes);
+                                using var page = engine.Process(pix);
+
+                                string text = page.GetText();
+                                float conf = page.GetMeanConfidence();
+
+                                // Update UI with the result for this page
+                                Invoke(new Action(() =>
+                                {
+                                    AppendPageResult(i + 1, text, conf);
+                                    progressBar.Value = i + 1;
+                                }));
+                            }
+                        }
+                        else if (ext == ".jpg" || ext == ".jpeg" || ext == ".png")
+                        {
+                            // Single-image flow
+                            // Load image bytes (avoid locking the file) and process as one page
+                            byte[] bytes = File.ReadAllBytes(filePath);
+
+                            using var ms = new MemoryStream(bytes);
+                            using var image = new Bitmap(ms);
+
+                            // Convert Bitmap to Pix via memory stream (PNG)
+                            using var ms2 = new MemoryStream();
+                            image.Save(ms2, System.Drawing.Imaging.ImageFormat.Png);
+                            var imgBytes = ms2.ToArray();
+
+                            using var pix = Pix.LoadFromMemory(imgBytes);
                             using var page = engine.Process(pix);
 
                             string text = page.GetText();
                             float conf = page.GetMeanConfidence();
 
-                            // Update UI with the result for this page
-                            Invoke(new Action(() =>
+                            progressBar.Invoke(new Action(() =>
                             {
-                                AppendPageResult(i + 1, text, conf);
-                                progressBar.Value = i + 1;
+                                progressBar.Maximum = 1;
+                                progressBar.Value = 1;
+                                AppendPageResult(1, text, conf);
                             }));
+                        }
+                        else
+                        {
+                            // Unsupported type (shouldn't happen due to filter), report to UI
+                            Invoke(new Action(() => MessageBox.Show($"Tipo de archivo no soportado: {ext}", "Tipo no soportado", MessageBoxButtons.OK, MessageBoxIcon.Warning)));
                         }
                     }
                     catch (Exception ex)
