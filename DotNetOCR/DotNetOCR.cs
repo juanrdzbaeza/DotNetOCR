@@ -21,18 +21,13 @@ namespace DotNetOCR
             if (openFileDialog1.ShowDialog() != DialogResult.OK)
                 return;
 
-            string pdfPath = openFileDialog1.FileName;
+            string filePath = openFileDialog1.FileName;
             rtbOutput.Clear();
 
             try
             {
                 progressBar.Visible = true;
                 progressBar.Value = 0;
-
-                // Load PDF document using PdfiumViewer
-                using var document = PdfDocument.Load(pdfPath);
-                int pageCount = document.PageCount;
-                progressBar.Maximum = Math.Max(1, pageCount);
 
                 // Determine tessdata path
                 string tessdataPath = Environment.GetEnvironmentVariable("TESSDATA_PREFIX") ?? string.Empty;
