@@ -142,6 +142,53 @@ namespace DotNetOCR
             }
         }
 
+        private void btnPaste_Click(object sender, EventArgs e)
+        {
+            if (Clipboard.ContainsImage())
+            {
+                using (var image = Clipboard.GetImage())
+                {
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        image.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Png);
+                        memoryStream.Position = 0;
+                        using (var pix = Pix.LoadFromMemory(memoryStream.ToArray()))
+                        {
+                            string tessdataPath = Environment.GetEnvironmentVariable("TESSDATA_PREFIX") ?? string.Empty;
+                            if (string.IsNullOrWhiteSpace(tessdataPath) || !Directory.Exists(tessdataPath))
+                            {
+                                using var fbd = new FolderBrowserDialog();
+                                fbd.Description = "Selecciona la carpeta que contiene los archivos tessdata (por ejemplo spa.traineddata).";
+                                if (fbd.ShowDialog() == DialogResult.OK)
+                                {
+                                    tessdataPath = fbd.SelectedPath;
+                                }
+                            }
+
+                            if (string.IsNullOrWhiteSpace(tessdataPath) || !Directory.Exists(tessdataPath))
+                            {
+                                MessageBox.Show("No se ha encontrado la carpeta tessdata. Por favor, configure la variable de entorno TESSDATA_PREFIX o seleccione la carpeta manualmente.", "Tessdata no encontrado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                                return;
+                            }
+
+                            using (var engine = new TesseractEngine(tessdataPath, File.Exists(Path.Combine(tessdataPath, "spa.traineddata")) ? "spa" : "eng", EngineMode.Default))
+                            {
+                                using (var page = engine.Process(pix))
+                                {
+                                    string extractedText = page.GetText();
+                                    rtbOutput.Text = extractedText;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                MessageBox.Show("No image found in the clipboard.");
+            }
+        }
+
         private void AppendPageResult(int pageNumber, string text, float confidence)
         {
             if (rtbOutput.InvokeRequired)
