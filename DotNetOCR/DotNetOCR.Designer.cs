@@ -46,7 +46,7 @@ namespace DotNetOCR
             btnSelectPdf.Name = "btnSelectPdf";
             btnSelectPdf.Size = new Size(120, 30);
             btnSelectPdf.TabIndex = 0;
-            btnSelectPdf.Text = "Seleccionar PDF";
+            btnSelectPdf.Text = "Seleccionar PDF/Imagen";
             btnSelectPdf.UseVisualStyleBackColor = true;
             btnSelectPdf.Click += btnSelectPdf_Click;
             // 
@@ -70,8 +70,8 @@ namespace DotNetOCR
             // 
             // openFileDialog1
             // 
-            openFileDialog1.Filter = "PDF files (*.pdf)|*.pdf";
-            openFileDialog1.Title = "Seleccionar archivo PDF";
+            openFileDialog1.Filter = "PDF files (*.pdf)|*.pdf|Image files (*.jpg;*.jpeg;*.png;*.bmp;*.gif)|*.jpg;*.jpeg;*.png;*.bmp;*.gif|All files (*.*)|*.*";
+            openFileDialog1.Title = "Seleccionar archivo PDF o imagen";
             // 
             // DotNetOCR
             // 
