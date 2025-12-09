@@ -8,6 +8,7 @@ namespace DotNetOCR
         private System.ComponentModel.IContainer components = null;
 
         private System.Windows.Forms.Button btnSelectPdf;
+        private System.Windows.Forms.Button btnPaste;
         private System.Windows.Forms.RichTextBox rtbOutput;
         private System.Windows.Forms.ProgressBar progressBar;
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
@@ -35,6 +36,7 @@ namespace DotNetOCR
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DotNetOCR));
             btnSelectPdf = new Button();
+            btnPaste = new Button();
             rtbOutput = new RichTextBox();
             progressBar = new ProgressBar();
             openFileDialog1 = new OpenFileDialog();
