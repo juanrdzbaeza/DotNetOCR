@@ -34,7 +34,6 @@ namespace DotNetOCR
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DotNetOCR));
             btnSelectPdf = new Button();
             btnPaste = new Button();
             rtbOutput = new RichTextBox();
