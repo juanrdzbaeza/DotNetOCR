@@ -1,185 +1,128 @@
-ï»¿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
+using System;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Tesseract;
+using PdfiumViewer;
 
 namespace DotNetOCR
 {
-    public partial class DotNetOCR : Form {
-        public DotNetOCR() {
+    public partial class DotNetOCR : Form
+    {
+        public DotNetOCR()
+        {
             InitializeComponent();
         }
 
-        private void btnSelectImage_Click(object sender, EventArgs e) {
+        private async void btnSelectPdf_Click(object sender, EventArgs e)
+        {
+            if (openFileDialog1.ShowDialog() != DialogResult.OK)
+                return;
 
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filter = "Image files (*.jpg, *.jpeg, *.png) | *.jpg; *.jpeg; *.png";
-            
-            if (openFileDialog.ShowDialog() == DialogResult.OK) {
-                
+            string pdfPath = openFileDialog1.FileName;
+            rtbOutput.Clear();
 
-                string selectedImagePath = openFileDialog.FileName;
-                
-                txtImagePath.Text = selectedImagePath;
+            try
+            {
+                progressBar.Visible = true;
+                progressBar.Value = 0;
 
-                if (string.IsNullOrEmpty(txtImagePath.Text)) {
-                    MessageBox.Show("Please select an image first.");
-                    return;
-                }
+                // Load PDF document using PdfiumViewer
+                using var document = PdfDocument.Load(pdfPath);
+                int pageCount = document.PageCount;
+                progressBar.Maximum = Math.Max(1, pageCount);
 
-                string tessdataPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "tessdata");
-
-                // Ensure tessdata and spa.traineddata are available in the output directory
-                string errorMsg;
-                if (!EnsureTessdataAvailable(out tessdataPath, out errorMsg)) {
-                    MessageBox.Show(errorMsg, "Tesseract data not found", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-
-                try {
-                    using (var engine = new TesseractEngine(tessdataPath, "spa", EngineMode.Default)) {
-
-                        using (var image = Pix.LoadFromFile(txtImagePath.Text)) {
-
-                            using (var page = engine.Process(image)) {
-
-                                string extractedText = page.GetText();
-                                txtExtractedText.Text = extractedText;
-                            }
-                        }
+                // Determine tessdata path
+                string tessdataPath = Environment.GetEnvironmentVariable("TESSDATA_PREFIX") ?? string.Empty;
+                if (string.IsNullOrWhiteSpace(tessdataPath) || !Directory.Exists(tessdataPath))
+                {
+                    // Ask user to select tessdata folder if not set
+                    using var fbd = new FolderBrowserDialog();
+                    fbd.Description = "Selecciona la carpeta que contiene los archivos tessdata (por ejemplo spa.traineddata).";
+                    if (fbd.ShowDialog() == DialogResult.OK)
+                    {
+                        tessdataPath = fbd.SelectedPath;
                     }
                 }
-                catch (Exception ex) {
-                    MessageBox.Show($"Error initializing Tesseract engine:\n{ex.Message}", "Tesseract error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                if (string.IsNullOrWhiteSpace(tessdataPath) || !Directory.Exists(tessdataPath))
+                {
+                    MessageBox.Show("No se ha encontrado la carpeta tessdata. Por favor, configure la variable de entorno TESSDATA_PREFIX o seleccione la carpeta manualmente.", "Tessdata no encontrado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    progressBar.Visible = false;
+                    return;
                 }
-            }
-        }
 
-        private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e) {
-            try {
-                // Specify the URL you want to open
-                string url = "https://github.com/juanrdzbaeza/DotNetOCR";
+                // Default language: spanish if available, otherwise english
+                string lang = File.Exists(Path.Combine(tessdataPath, "spa.traineddata")) ? "spa" : "eng";
 
-                // Use the default browser to open the URL
-                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo {
-                    FileName = url,
-                    UseShellExecute = true
+                // Run OCR in background to keep UI responsive
+                await Task.Run(() =>
+                {
+                    try
+                    {
+                        using var engine = new TesseractEngine(tessdataPath, lang, EngineMode.Default);
+
+                        for (int i = 0; i < pageCount; i++)
+                        {
+                            // Render page to bitmap at 150 DPI
+                            using var image = document.Render(i, 150, 150, PdfRenderFlags.CorrectFromDpi);
+
+                            // Convert Bitmap to Pix via memory stream
+                            using var ms = new MemoryStream();
+                            image.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+                            var bytes = ms.ToArray();
+
+                            using var pix = Pix.LoadFromMemory(bytes);
+                            using var page = engine.Process(pix);
+
+                            string text = page.GetText();
+                            float conf = page.GetMeanConfidence();
+
+                            // Update UI with the result for this page
+                            Invoke(new Action(() =>
+                            {
+                                AppendPageResult(i + 1, text, conf);
+                                progressBar.Value = i + 1;
+                            }));
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Invoke(new Action(() => MessageBox.Show($"Error al ejecutar OCR: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)));
+                    }
                 });
             }
-            catch (Exception ex) {
-                MessageBox.Show($"An error occurred while trying to open the link: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error procesando el PDF: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                progressBar.Visible = false;
             }
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private void AppendPageResult(int pageNumber, string text, float confidence)
         {
-            if (Clipboard.ContainsImage())
+            if (rtbOutput.InvokeRequired)
             {
-                using (var image = Clipboard.GetImage())
-                {
-                    using (var memoryStream = new MemoryStream())
-                    {
-                        image.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Png);
-                        memoryStream.Position = 0;
-                        using (var pix = Pix.LoadFromMemory(memoryStream.ToArray()))
-                        {
-                            string tessdataPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "tessdata");
-
-                            string errorMsg;
-                            if (!EnsureTessdataAvailable(out tessdataPath, out errorMsg)) {
-                                MessageBox.Show(errorMsg, "Tesseract data not found", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                return;
-                            }
-
-                            try {
-                                using (var engine = new TesseractEngine(tessdataPath, "spa", EngineMode.Default))
-                                {
-                                    using (var page = engine.Process(pix))
-                                    {
-                                        string extractedText = page.GetText();
-                                        txtExtractedText.Text = extractedText;
-                                    }
-                                }
-                            }
-                            catch (Exception ex) {
-                                MessageBox.Show($"Error initializing Tesseract engine:\n{ex.Message}", "Tesseract error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            }
-                        }
-                    }
-                }
-            }
-            else
-            {
-                MessageBox.Show("No image found in the clipboard.");
-            }
-        }
-
-        // Tries to ensure tessdata is present in the application's base directory.
-        // If not present, searches parent directories for a 'tessdata' folder containing 'spa.traineddata'
-        // and copies it into the application's output directory.
-        private bool EnsureTessdataAvailable(out string tessdataPath, out string errorMessage)
-        {
-            tessdataPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "tessdata");
-            string spaFile = Path.Combine(tessdataPath, "spa.traineddata");
-            if (Directory.Exists(tessdataPath) && File.Exists(spaFile)) {
-                errorMessage = null;
-                return true;
+                rtbOutput.Invoke(new Action(() => AppendPageResult(pageNumber, text, confidence)));
+                return;
             }
 
-            // Search upwards for a tessdata folder (project folder, solution root, user folder, etc.)
-            string dir = AppDomain.CurrentDomain.BaseDirectory.TrimEnd(Path.DirectorySeparatorChar);
-            for (int i = 0; i < 6; i++) {
-                string candidate = Path.Combine(dir, "tessdata");
-                string candidateSpa = Path.Combine(candidate, "spa.traineddata");
-                if (Directory.Exists(candidate) && File.Exists(candidateSpa)) {
-                    try {
-                        CopyDirectory(candidate, tessdataPath);
-                        if (File.Exists(Path.Combine(tessdataPath, "spa.traineddata"))) {
-                            errorMessage = null;
-                            return true;
-                        }
-                        else {
-                            errorMessage = $"Copied tessdata from '{candidate}' but '{spaFile}' is still missing after copy.";
-                            return false;
-                        }
-                    }
-                    catch (Exception ex) {
-                        errorMessage = $"Found tessdata at '{candidate}' but failed to copy to output folder: {ex.Message}";
-                        return false;
-                    }
-                }
+            // Simple RTF enriched formatting: page header bold and confidence in color
+            rtbOutput.SelectionStart = rtbOutput.TextLength;
+            rtbOutput.SelectionFont = new Font(rtbOutput.Font, FontStyle.Bold);
+            rtbOutput.AppendText($"--- Página {pageNumber} (Confianza: {confidence:P1}) ---\n");
 
-                dir = Path.GetDirectoryName(dir);
-                if (string.IsNullOrEmpty(dir)) break;
-            }
+            rtbOutput.SelectionFont = new Font(rtbOutput.Font, FontStyle.Regular);
+            rtbOutput.AppendText(text + "\n\n");
 
-            errorMessage = "Could not find 'tessdata' with 'spa.traineddata' in the application folder or parent folders.\n" +
-                           "Make sure the 'tessdata' folder (containing spa.traineddata) is copied to the application's output directory or set the TESSDATA_PREFIX environment variable.";
-            return false;
-        }
-
-        private void CopyDirectory(string sourceDir, string destinationDir)
-        {
-            if (!Directory.Exists(destinationDir)) Directory.CreateDirectory(destinationDir);
-
-            foreach (var file in Directory.GetFiles(sourceDir))
-            {
-                var destFile = Path.Combine(destinationDir, Path.GetFileName(file));
-                File.Copy(file, destFile, true);
-            }
-
-            foreach (var directory in Directory.GetDirectories(sourceDir))
-            {
-                var destSubDir = Path.Combine(destinationDir, Path.GetFileName(directory));
-                CopyDirectory(directory, destSubDir);
-            }
+            // Scroll to end
+            rtbOutput.SelectionStart = rtbOutput.TextLength;
+            rtbOutput.ScrollToCaret();
         }
     }
 }
