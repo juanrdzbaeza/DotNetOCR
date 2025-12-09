@@ -52,22 +52,32 @@ namespace DotNetOCR
             btnSelectPdf.UseVisualStyleBackColor = true;
             btnSelectPdf.Click += btnSelectPdf_Click;
             // 
+            // btnPaste
+            // 
+            btnPaste.Location = new Point(140, 12);
+            btnPaste.Name = "btnPaste";
+            btnPaste.Size = new Size(120, 30);
+            btnPaste.TabIndex = 1;
+            btnPaste.Text = "Pegar";
+            btnPaste.UseVisualStyleBackColor = true;
+            btnPaste.Click += btnPaste_Click;
+            // 
             // rtbOutput
             // 
             rtbOutput.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             rtbOutput.Location = new Point(12, 60);
             rtbOutput.Name = "rtbOutput";
             rtbOutput.Size = new Size(1118, 643);
-            rtbOutput.TabIndex = 1;
+            rtbOutput.TabIndex = 2;
             rtbOutput.Text = "";
             // 
             // progressBar
             // 
             progressBar.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            progressBar.Location = new Point(150, 17);
+            progressBar.Location = new Point(280, 17);
             progressBar.Name = "progressBar";
-            progressBar.Size = new Size(980, 20);
-            progressBar.TabIndex = 2;
+            progressBar.Size = new Size(780, 20);
+            progressBar.TabIndex = 3;
             progressBar.Visible = false;
             // 
             // openFileDialog1
@@ -82,6 +92,7 @@ namespace DotNetOCR
             ClientSize = new Size(1142, 715);
             Controls.Add(rtbOutput);
             Controls.Add(progressBar);
+            Controls.Add(btnPaste);
             Controls.Add(btnSelectPdf);
             Name = "DotNetOCR";
             Text = "DotNetOCR - OCR de PDF";
