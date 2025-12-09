@@ -45,7 +45,7 @@ namespace DotNetOCR
             // 
             btnSelectPdf.Location = new Point(12, 12);
             btnSelectPdf.Name = "btnSelectPdf";
-            btnSelectPdf.Size = new Size(120, 30);
+            btnSelectPdf.Size = new Size(140, 60);
             btnSelectPdf.TabIndex = 0;
             btnSelectPdf.Text = "Seleccionar PDF/Imagen";
             btnSelectPdf.UseVisualStyleBackColor = true;
@@ -53,9 +53,9 @@ namespace DotNetOCR
             // 
             // btnPaste
             // 
-            btnPaste.Location = new Point(140, 12);
+            btnPaste.Location = new Point(158, 12);
             btnPaste.Name = "btnPaste";
-            btnPaste.Size = new Size(120, 30);
+            btnPaste.Size = new Size(120, 60);
             btnPaste.TabIndex = 1;
             btnPaste.Text = "Pegar";
             btnPaste.UseVisualStyleBackColor = true;
@@ -64,18 +64,18 @@ namespace DotNetOCR
             // rtbOutput
             // 
             rtbOutput.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            rtbOutput.Location = new Point(12, 60);
+            rtbOutput.Location = new Point(12, 78);
             rtbOutput.Name = "rtbOutput";
-            rtbOutput.Size = new Size(1118, 643);
+            rtbOutput.Size = new Size(1118, 625);
             rtbOutput.TabIndex = 2;
             rtbOutput.Text = "";
             // 
             // progressBar
             // 
             progressBar.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            progressBar.Location = new Point(280, 17);
+            progressBar.Location = new Point(284, 17);
             progressBar.Name = "progressBar";
-            progressBar.Size = new Size(780, 20);
+            progressBar.Size = new Size(776, 20);
             progressBar.TabIndex = 3;
             progressBar.Visible = false;
             // 
