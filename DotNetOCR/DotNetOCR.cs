@@ -1,11 +1,12 @@
+using PdfiumViewer;
+using Tesseract;
+
 using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Tesseract;
-using PdfiumViewer;
 
 namespace DotNetOCR
 {
@@ -133,7 +134,7 @@ namespace DotNetOCR
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error procesando el PDF: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Error procesando el archivo: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
