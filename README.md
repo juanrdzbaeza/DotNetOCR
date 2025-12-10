@@ -1,25 +1,25 @@
 # DotNetOCR
 
-Aplicaciï¿½n Windows Forms en .NET 10 que usa Tesseract para realizar OCR sobre PDFs e imï¿½genes.
+Aplicación Windows Forms en .NET 10 que usa Tesseract para realizar OCR sobre PDFs e imágenes.
 
-## Caracterï¿½sticas
+## Características
 
-- Procesado de PDFs por pï¿½gina (renderizado con PdfiumViewer).
-- Procesado de imï¿½genes (PNG/JPEG).
-- Soporta selecciï¿½n de archivos y pegar desde el portapapeles.
-- Integraciï¿½n con Tesseract (soporta `spa`/`eng` segï¿½n los datos instalados).
+- Procesado de PDFs por página (renderizado con PdfiumViewer).
+- Procesado de imágenes (PNG/JPEG).
+- Soporta selección de archivos y pegar desde el portapapeles.
+- Integración con Tesseract (soporta `spa`/`eng` según los datos instalados).
 
 ## Requisitos
 
 - .NET 10 (Windows)
-- Tesseract (librerï¿½a nativa y archivos de datos `tessdata`)
+- Tesseract (librería nativa y archivos de datos `tessdata`)
 - Paquetes NuGet usados:
   - `Tesseract` (v5.x)
   - `PdfiumViewer`
 
-El proyecto estï¿½ configurado para `x64` en `PlatformTarget`.
+El proyecto está configurado para `x64` en `PlatformTarget`.
 
-## Instalaciï¿½n y ejecuciï¿½n
+## Instalación y ejecución
 
 1. Clona el repositorio:
 
@@ -41,36 +41,36 @@ El proyecto estï¿½ configurado para `x64` en `PlatformTarget`.
    dotnet run --project DotNetOCR -c Release
    ```
 
-Nota: el proyecto es una aplicaciï¿½n WinForms; se recomienda abrirla con Visual Studio para una experiencia completa.
+Nota: el proyecto es una aplicación WinForms; se recomienda abrirla con Visual Studio para una experiencia completa.
 
 ## Configurar los datos de Tesseract (`tessdata`)
 
 Tesseract necesita los archivos `.traineddata` para funcionar (por ejemplo `spa.traineddata`). Hay dos opciones:
 
-- Opciï¿½n A ï¿½ Variable de entorno `TESSDATA_PREFIX` (recomendado):
+- Opción A — Variable de entorno `TESSDATA_PREFIX` (recomendado):
   1. Crea una carpeta con los archivos de lenguaje (ej. `C:\tessdata`).
-  2. Aï¿½ade la variable de entorno `TESSDATA_PREFIX` apuntando a esa carpeta.
+  2. Añade la variable de entorno `TESSDATA_PREFIX` apuntando a esa carpeta.
 
-- Opciï¿½n B ï¿½ Carpeta `tessdata` junto al ejecutable:
+- Opción B — Carpeta `tessdata` junto al ejecutable:
   Coloca una carpeta `tessdata` en el mismo directorio que el exe con los `.traineddata` dentro.
 
-En la UI la aplicaciï¿½n intenta usar `TESSDATA_PREFIX`, si no existe busca `tessdata` en el directorio de la app y, si no lo encuentra, solicita que el usuario seleccione la carpeta.
+En la UI la aplicación intenta usar `TESSDATA_PREFIX`; si no existe busca `tessdata` en el directorio de la app y, si no lo encuentra, solicita que el usuario seleccione la carpeta.
 
 ## Uso
 
-1. Inicia la aplicaciï¿½n.
+1. Inicia la aplicación.
 2. Haz clic en `Seleccionar PDF/Imagen` para elegir un archivo o en `Pegar` para procesar la imagen del portapapeles.
-3. El texto resultante aparecerï¿½ en el ï¿½rea de salida con confianza por pï¿½gina (para PDFs).
+3. El texto resultante aparecerá en el área de salida con la confianza por página (para PDFs).
 
-## Troubleshooting ï¿½ problemas comunes
+## Troubleshooting — problemas comunes
 
 - "Failed to initialise tesseract engine":
-  - Asegï¿½rate de que los archivos `*.traineddata` estï¿½n en la carpeta `tessdata` correcta y que el idioma solicitado exista (por ejemplo `spa.traineddata`).
+  - Asegúrate de que los archivos `*.traineddata` estén en la carpeta `tessdata` correcta y que el idioma solicitado exista (por ejemplo `spa.traineddata`).
   - Verifica la variable de entorno `TESSDATA_PREFIX` si la usas.
 
 - `MissingManifestResourceException` al cargar iconos o recursos del formulario:
-  - La forma en que WinForms carga recursos del diseï¿½ador espera que el `.resx` del formulario se compile como `EmbeddedResource`.
-  - Si ves una excepciï¿½n del tipo "Could not find the resource 'DotNetOCR.DotNetOCR.resources'", abre `DotNetOCR.csproj` y asegura que `DotNetOCR.resx` estï¿½ incluido como `EmbeddedResource` (no marcado como `None` o removido). Ejemplo:
+  - La forma en que WinForms carga recursos del diseñador espera que el `.resx` del formulario se compile como `EmbeddedResource`.
+  - Si ves una excepción del tipo "Could not find the resource 'DotNetOCR.DotNetOCR.resources'", abre `DotNetOCR.csproj` y asegúrate de que `DotNetOCR.resx` está incluido como `EmbeddedResource` (no marcado como `None` o removido). Ejemplo:
 
     ```xml
     <ItemGroup>
@@ -78,30 +78,30 @@ En la UI la aplicaciï¿½n intenta usar `TESSDATA_PREFIX`, si no existe busca `tes
     </ItemGroup>
     ```
 
-  - Alternativamente puedes cargar el icono desde archivo en tiempo de ejecuciï¿½n:
+  - Alternativamente puedes cargar el icono desde archivo en tiempo de ejecución:
 
     ```csharp
     this.Icon = new System.Drawing.Icon(Path.Combine(AppContext.BaseDirectory, "Resources", "OCR_icon.ico"));
     ```
 
 - PDF rendering / native `pdfium.dll`:
-  - El proyecto contiene un `Target` que intenta copiar `native\$(PlatformTarget)\pdfium.dll` al directorio de salida si existe. Asegï¿½rate de proporcionar esa DLL nativa para render de PDFs si la necesitas.
+  - El proyecto contiene un `Target` que intenta copiar `native\$(PlatformTarget)\pdfium.dll` al directorio de salida si existe. Asegúrate de proporcionar esa DLL nativa para el render de PDFs si la necesitas.
 
 ## Estructura relevante
 
-- `DotNetOCR/` ï¿½ proyecto principal (WinForms).
-- `DotNetOCR/DotNetOCR.resx` ï¿½ recursos del formulario (icono embebido).
-- `Resources/` ï¿½ iconos e imï¿½genes incluidos como `None` en el proyecto; el icono de la aplicaciï¿½n puede configurarse en la propiedad `ApplicationIcon`.
+- `DotNetOCR/` — proyecto principal (WinForms).
+- `DotNetOCR/DotNetOCR.resx` — recursos del formulario (icono embebido).
+- `Resources/` — iconos e imágenes incluidos como `None` en el proyecto; el icono de la aplicación puede configurarse en la propiedad `ApplicationIcon`.
 
 ## Contribuir
 
 1. Haz fork y crea una rama con tu cambio (`feature/mi-cambio`).
 2. Abre un Pull Request describiendo los cambios.
 
-Buenas prï¿½cticas:
-- Mantener los archivos `.resx` del diseï¿½ador como `EmbeddedResource`.
+Buenas prácticas:
+- Mantener los archivos `.resx` del diseñador como `EmbeddedResource`.
 - No incluir blobs binarios enormes en los archivos de texto; preferir recursos binarios separados o la carpeta `Resources/`.
 
 ## Licencia
 
-Proyecto bajo la licencia MIT ï¿½ ver `LICENSE.txt`.
+Proyecto bajo la licencia MIT — ver `LICENSE.txt`.
