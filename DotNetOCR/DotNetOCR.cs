@@ -209,6 +209,27 @@ namespace DotNetOCR
             }
         }
 
+        private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            try
+            {
+                // Specify the URL you want to open
+                string url = "https://github.com/juanrdzbaeza/DotNetOCR";
+
+                // Use the default browser to open the URL
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = url,
+                    UseShellExecute = true
+                });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"An error occurred while trying to open the link: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+
         private void AppendPageResult(int pageNumber, string text, float confidence)
         {
             if (rtbOutput.InvokeRequired)
