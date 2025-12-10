@@ -1,69 +1,111 @@
 # DotNetOCR
 
-DotNetOCR is a .NET application that uses Tesseract OCR engine to perform optical character recognition on images.
+Aplicación Windows Forms en .NET 10 que usa Tesseract para realizar OCR sobre PDFs e imágenes.
 
-## Prerequisites
+## Características
 
-- .NET Framework (version used in your project)
-- Tesseract OCR engine
-- Tesseract language data files
+- Procesado de PDFs por página (renderizado con PdfiumViewer).
+- Procesado de imágenes (PNG/JPEG).
+- Soporta selección de archivos y pegar desde el portapapeles.
+- Integración con Tesseract (soporta `spa`/`eng` según los datos instalados).
 
-## Setup
+## Requisitos
 
-1. Clone this repository or download the source code.
-2. Ensure you have the required Tesseract language data files (e.g., `spa.traineddata` for Spanish).
+- .NET 10 (Windows)
+- Tesseract (librería nativa y archivos de datos `tessdata`)
+- Paquetes NuGet usados:
+  - `Tesseract` (v5.x)
+  - `PdfiumViewer`
 
-### Setting up Tesseract Data Files
+El proyecto está configurado para `x64` en `PlatformTarget`.
 
-You have two options to set up the Tesseract data files:
+## Instalación y ejecución
 
-#### Option 1: Using TESSDATA_PREFIX Environment Variable
+1. Clona el repositorio:
 
-1. Create a directory to store your Tesseract data files (e.g., `C:\tessdata`).
-2. Place your language data files (e.g., `spa.traineddata`) in this directory.
-3. Set the TESSDATA_PREFIX environment variable:
-   - Open System Properties (Right-click on This PC > Properties)
-   - Click on Advanced system settings
-   - Click on Environment Variables
-   - Under System variables, click New
-   - Set Variable name as TESSDATA_PREFIX
-   - Set Variable value as the path to your tessdata directory (e.g., C:\tessdata\)
-   - Click OK to save
+   ```bash
+   git clone https://github.com/juanrdzbaeza/DotNetOCR.git
+   cd DotNetOCR/DotNetOCR
+   ```
 
-#### Option 2: Specifying the Path in Code
+2. Restaurar paquetes y construir:
 
-If you prefer not to use an environment variable, you can specify the path to the tessdata directory directly in your code:
+   ```bash
+   dotnet restore
+   dotnet build -c Release
+   ```
 
-1. Create a directory to store your Tesseract data files (e.g., `C:\tessdata`).
-2. Place your language data files (e.g., `spa.traineddata`) in this directory.
-3. In your code, when initializing the TesseractEngine, provide the path to the tessdata directory:
+3. Ejecutar (desde Visual Studio o CLI):
 
-```csharp
-string tessdataPath = @"C:\tessdata\";
-using (var engine = new TesseractEngine(tessdataPath, "spa", EngineMode.Default))
-{
-    // Rest of your OCR code
-}
-```
+   ```bash
+   dotnet run --project DotNetOCR -c Release
+   ```
 
+Nota: el proyecto es una aplicación WinForms; se recomienda abrirla con Visual Studio para una experiencia completa.
 
-## Usage
-1. Run the application.
-2. Click the "Select Image" button to choose an image for OCR processing.
-3. The recognized text will be displayed in the text area.
+## Configurar los datos de Tesseract (`tessdata`)
 
-### Troubleshooting
+Tesseract necesita los archivos `.traineddata` para funcionar (por ejemplo `spa.traineddata`). Hay dos opciones:
 
-If you encounter the error "Failed to initialise tesseract engine", ensure that:
-- You have downloaded the correct language data files.
-- The TESSDATA_PREFIX environment variable is set correctly (if using Option 1).
-- The path to the tessdata directory is correct in your code (if using Option 2).
-- The language code used in the TesseractEngine constructor matches your language data file (e.g., "spa" for Spanish).
+- Opción A — Variable de entorno `TESSDATA_PREFIX` (recomendado):
+  1. Crea una carpeta con los archivos de lenguaje (ej. `C:\tessdata`).
+  2. Añade la variable de entorno `TESSDATA_PREFIX` apuntando a esa carpeta.
 
-## Contributing
+- Opción B — Carpeta `tessdata` junto al ejecutable:
+  Coloca una carpeta `tessdata` en el mismo directorio que el exe con los `.traineddata` dentro.
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+En la UI la aplicación intenta usar `TESSDATA_PREFIX`, si no existe busca `tessdata` en el directorio de la app y, si no lo encuentra, solicita que el usuario seleccione la carpeta.
 
-## License
+## Uso
 
-This project is licensed under the MIT License - see the LICENSE.txt file for details.
+1. Inicia la aplicación.
+2. Haz clic en `Seleccionar PDF/Imagen` para elegir un archivo o en `Pegar` para procesar la imagen del portapapeles.
+3. El texto resultante aparecerá en el área de salida con confianza por página (para PDFs).
+
+## Troubleshooting — problemas comunes
+
+- "Failed to initialise tesseract engine":
+  - Asegúrate de que los archivos `*.traineddata` estén en la carpeta `tessdata` correcta y que el idioma solicitado exista (por ejemplo `spa.traineddata`).
+  - Verifica la variable de entorno `TESSDATA_PREFIX` si la usas.
+
+- `MissingManifestResourceException` al cargar iconos o recursos del formulario:
+  - La forma en que WinForms carga recursos del diseñador espera que el `.resx` del formulario se compile como `EmbeddedResource`.
+  - Si ves una excepción del tipo "Could not find the resource 'DotNetOCR.DotNetOCR.resources'", abre `DotNetOCR.csproj` y asegura que `DotNetOCR.resx` está incluido como `EmbeddedResource` (no marcado como `None` o removido). Ejemplo:
+
+    ```xml
+    <ItemGroup>
+      <EmbeddedResource Include="DotNetOCR.resx" />
+    </ItemGroup>
+    ```
+
+  - Alternativamente puedes cargar el icono desde archivo en tiempo de ejecución:
+
+    ```csharp
+    this.Icon = new System.Drawing.Icon(Path.Combine(AppContext.BaseDirectory, "Resources", "OCR_icon.ico"));
+    ```
+
+- PDF rendering / native `pdfium.dll`:
+  - El proyecto contiene un `Target` que intenta copiar `native\$(PlatformTarget)\pdfium.dll` al directorio de salida si existe. Asegúrate de proporcionar esa DLL nativa para render de PDFs si la necesitas.
+
+## Estructura relevante
+
+- `DotNetOCR/` — proyecto principal (WinForms).
+- `DotNetOCR/DotNetOCR.resx` — recursos del formulario (icono embebido).
+- `Resources/` — iconos e imágenes incluidos como `None` en el proyecto; el icono de la aplicación puede configurarse en la propiedad `ApplicationIcon`.
+
+## Contribuir
+
+1. Haz fork y crea una rama con tu cambio (`feature/mi-cambio`).
+2. Abre un Pull Request describiendo los cambios.
+
+Buenas prácticas:
+- Mantener los archivos `.resx` del diseñador como `EmbeddedResource`.
+- No incluir blobs binarios enormes en los archivos de texto; preferir recursos binarios separados o la carpeta `Resources/`.
+
+## Licencia
+
+Proyecto bajo la licencia MIT — ver `LICENSE.txt`.
+
+---
+
+Si quieres que adapte el README en inglés o que añada badges/status CI, lo hago.
