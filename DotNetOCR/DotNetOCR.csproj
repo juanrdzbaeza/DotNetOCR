@@ -16,11 +16,11 @@
     <PackageReference Include="Tesseract" Version="5.2.0" />
   </ItemGroup>
 
-  <!-- Exclude problematic resx that is empty and breaks the build -->
+  <!-- Exclude problematic resx that is empty and breaks the build 
   <ItemGroup>
     <EmbeddedResource Remove="DotNetOCR.resx" />
     <None Include="DotNetOCR.resx" />
-  </ItemGroup>
+  </ItemGroup>-->
 
   <!-- Ensure application icon is included in the project -->
   <ItemGroup>

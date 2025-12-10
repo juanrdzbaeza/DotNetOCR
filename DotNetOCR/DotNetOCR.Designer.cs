@@ -34,6 +34,7 @@ namespace DotNetOCR
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DotNetOCR));
             btnSelectPdf = new Button();
             btnPaste = new Button();
             rtbOutput = new RichTextBox();
@@ -45,7 +46,7 @@ namespace DotNetOCR
             // 
             btnSelectPdf.Location = new Point(12, 12);
             btnSelectPdf.Name = "btnSelectPdf";
-            btnSelectPdf.Size = new Size(140, 60);
+            btnSelectPdf.Size = new Size(140, 77);
             btnSelectPdf.TabIndex = 0;
             btnSelectPdf.Text = "Seleccionar PDF/Imagen";
             btnSelectPdf.UseVisualStyleBackColor = true;
@@ -53,29 +54,29 @@ namespace DotNetOCR
             // 
             // btnPaste
             // 
+            btnPaste.Image = (Image)resources.GetObject("btnPaste.Image");
             btnPaste.Location = new Point(158, 12);
             btnPaste.Name = "btnPaste";
-            btnPaste.Size = new Size(120, 60);
+            btnPaste.Size = new Size(80, 77);
             btnPaste.TabIndex = 1;
-            btnPaste.Text = "Pegar";
             btnPaste.UseVisualStyleBackColor = true;
             btnPaste.Click += btnPaste_Click;
             // 
             // rtbOutput
             // 
             rtbOutput.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            rtbOutput.Location = new Point(12, 78);
+            rtbOutput.Location = new Point(12, 95);
             rtbOutput.Name = "rtbOutput";
-            rtbOutput.Size = new Size(1118, 625);
+            rtbOutput.Size = new Size(1118, 608);
             rtbOutput.TabIndex = 2;
             rtbOutput.Text = "";
             // 
             // progressBar
             // 
             progressBar.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            progressBar.Location = new Point(284, 17);
+            progressBar.Location = new Point(244, 17);
             progressBar.Name = "progressBar";
-            progressBar.Size = new Size(776, 20);
+            progressBar.Size = new Size(816, 20);
             progressBar.TabIndex = 3;
             progressBar.Visible = false;
             // 
@@ -93,6 +94,8 @@ namespace DotNetOCR
             Controls.Add(progressBar);
             Controls.Add(btnPaste);
             Controls.Add(btnSelectPdf);
+            Icon = (Icon)resources.GetObject("$this.Icon");
+            MinimumSize = new Size(820, 500);
             Name = "DotNetOCR";
             Text = "DotNetOCR - OCR de PDF";
             ResumeLayout(false);
