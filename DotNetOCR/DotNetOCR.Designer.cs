@@ -12,6 +12,7 @@ namespace DotNetOCR
         private System.Windows.Forms.RichTextBox rtbOutput;
         private System.Windows.Forms.ProgressBar progressBar;
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
+        private System.Windows.Forms.LinkLabel linkLabel1;
 
         /// <summary>
         ///  Clean up any resources being used.
@@ -40,6 +41,7 @@ namespace DotNetOCR
             rtbOutput = new RichTextBox();
             progressBar = new ProgressBar();
             openFileDialog1 = new OpenFileDialog();
+            linkLabel1 = new LinkLabel();
             SuspendLayout();
             // 
             // btnSelectPdf
@@ -67,7 +69,7 @@ namespace DotNetOCR
             rtbOutput.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             rtbOutput.Location = new Point(12, 95);
             rtbOutput.Name = "rtbOutput";
-            rtbOutput.Size = new Size(1118, 608);
+            rtbOutput.Size = new Size(1118, 583);
             rtbOutput.TabIndex = 2;
             rtbOutput.Text = "";
             // 
@@ -85,6 +87,18 @@ namespace DotNetOCR
             openFileDialog1.Filter = "PDF files (*.pdf)|*.pdf|Image files (*.jpg;*.jpeg;*.png;*.bmp;*.gif)|*.jpg;*.jpeg;*.png;*.bmp;*.gif|All files (*.*)|*.*";
             openFileDialog1.Title = "Seleccionar archivo PDF o imagen";
             // 
+            // linkLabel1
+            // 
+            linkLabel1.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            linkLabel1.AutoSize = true;
+            linkLabel1.Location = new Point(913, 681);
+            linkLabel1.Name = "linkLabel1";
+            linkLabel1.Size = new Size(217, 25);
+            linkLabel1.TabIndex = 2;
+            linkLabel1.TabStop = true;
+            linkLabel1.Text = "juanrdzbaeza/DotNetOCR";
+            this.linkLabel1.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel1_LinkClicked);
+            // 
             // DotNetOCR
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
@@ -94,11 +108,13 @@ namespace DotNetOCR
             Controls.Add(progressBar);
             Controls.Add(btnPaste);
             Controls.Add(btnSelectPdf);
+            Controls.Add(linkLabel1);
             Icon = (Icon)resources.GetObject("$this.Icon");
             MinimumSize = new Size(820, 500);
             Name = "DotNetOCR";
             Text = "DotNetOCR - OCR de PDF";
             ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
